@@ -9,17 +9,18 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityWebFilterChain securityFilterChain(
-            ServerHttpSecurity http) {
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
 
         return http
                 .csrf(csrf -> csrf.disable())
+                .httpBasic(basic -> basic.disable())
+                .formLogin(form -> form.disable())
+                .logout(logout -> logout.disable())
+
                 .authorizeExchange(ex -> ex
-                        .pathMatchers("/auth/**").permitAll()
+                        .pathMatchers("/finpro/auth/**").permitAll()
                         .anyExchange().authenticated()
                 )
-                .httpBasic(basic -> basic.disable())
-                .formLogin(login -> login.disable())
                 .build();
     }
 }

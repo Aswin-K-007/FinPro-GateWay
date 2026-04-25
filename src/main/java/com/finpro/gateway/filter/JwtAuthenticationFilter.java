@@ -19,7 +19,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
 
         String path = exchange.getRequest().getURI().getPath();
 
-        if (path.startsWith("finpro/auth")) {
+        if (path.startsWith("/finpro/auth")) {
             return chain.filter(exchange);
         }
 

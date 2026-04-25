@@ -23,3 +23,9 @@ spring:
           uri: http://localhost:8083
           predicates:
             - Path=/finpro/users/**
+
+logging:
+  level:
+    reactor.netty.http.client: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.security: TRACE
