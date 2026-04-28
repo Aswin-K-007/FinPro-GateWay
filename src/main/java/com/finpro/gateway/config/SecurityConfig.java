@@ -2,25 +2,24 @@ package com.finpro.gateway.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
+@EnableWebFluxSecurity 
 public class SecurityConfig {
-
-    @Bean
-    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-
-        return http
-                .csrf(csrf -> csrf.disable())
-                .httpBasic(basic -> basic.disable())
-                .formLogin(form -> form.disable())
-                .logout(logout -> logout.disable())
-
-                .authorizeExchange(ex -> ex
-                        .pathMatchers("/finpro/auth/**").permitAll()
-                        .anyExchange().authenticated()
-                )
-                .build();
-    }
+	
+@Bean
+public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+		return http
+		.csrf(ServerHttpSecurity.CsrfSpec::disable)
+		.authorizeExchange(exchanges -> exchanges
+		.anyExchange().permitAll() 
+		)
+		.httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+		.formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+		.build();
+	}
 }
+

@@ -1,46 +1,33 @@
 package com.finpro.gateway.filter;
 
-import com.finpro.gateway.constants.SecurityConstants;
-import com.finpro.gateway.util.JwtUtil;
-import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import com.finpro.gateway.util.JwtValidator;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.core.publisher.Mono;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
 
 @Component
-public class JwtAuthenticationFilter implements GlobalFilter {
+public class JwtAuthenticationFilter
+        extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
+
+    @Value("${app.jwt.secret}")
+    private String jwtSecret;
+
+    public JwtAuthenticationFilter() {
+        super(Config.class);
+    }
 
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange,
-                             GatewayFilterChain chain) {
+    public GatewayFilter apply(Config config) {
 
-        String path = exchange.getRequest().getURI().getPath();
+        return (exchange, chain) ->
+                JwtValidator.validate(
+                        exchange,
+                        jwtSecret,
+                        () -> chain.filter(exchange)
+                );
+    }
 
-        if (path.startsWith("/finpro/auth")) {
-            return chain.filter(exchange);
-        }
-
-        HttpHeaders headers = exchange.getRequest().getHeaders();
-
-        if (!headers.containsKey(SecurityConstants.HEADER)) {
-            exchange.getResponse()
-                    .setStatusCode(HttpStatus.UNAUTHORIZED);
-            return exchange.getResponse().setComplete();
-        }
-
-        String token = headers
-                .getFirst(SecurityConstants.HEADER)
-                .replace(SecurityConstants.PREFIX, "");
-
-        if (!JwtUtil.validate(token)) {
-            exchange.getResponse()
-                    .setStatusCode(HttpStatus.UNAUTHORIZED);
-            return exchange.getResponse().setComplete();
-        }
-
-        return chain.filter(exchange);
+    public static class Config {
     }
 }
