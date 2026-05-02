@@ -28,8 +28,8 @@ spring:
           uri: http://localhost:8083
           predicates:
             - Path=/finpro/expenses/**
-#          filters:
-#            - JwtAuthenticationFilter
+          filters:
+            - JwtAuthenticationFilter
 
 logging:
   level:
